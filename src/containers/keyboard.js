@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import Key from './key';
 
 const Layout = styled.div`
   display: grid;
@@ -15,10 +16,11 @@ class Keyboard extends Component {
       'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
     ],
   }
+
   render() {
     return (
       <Layout>
-        { this.state.keys.map((keycode, i) => <p key={i}>{keycode}</p>) }
+        { this.state.keys.map((keycode, i) => <Key key={i} keycode={keycode} />) }
       </Layout>
     );
   }
