@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import Keyboard from '../containers/keyboard';
 
 const AppPage = styled.div`
   background-color: #282c34;
@@ -15,7 +16,7 @@ class App extends Component {
   render() {
     return (
       <AppPage>
-        <h1>My App</h1>
+        <Keyboard />
       </AppPage>
     );
   }
