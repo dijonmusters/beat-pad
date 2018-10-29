@@ -13,6 +13,15 @@ const AppPage = styled.div`
 `
 
 class App extends Component {
+  componentDidMount() {
+    try {
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    }
+    catch(e) {
+      alert('Web Audio API is not supported in this browser');
+    }
+  }
+
   render() {
     return (
       <AppPage>

@@ -15,12 +15,14 @@ class Keyboard extends Component {
       'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',
       'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
     ],
+    context: new AudioContext(),
   }
 
   render() {
+    const { context } = this.state;
     return (
       <Layout>
-        { this.state.keys.map((keycode, i) => <Key key={i} keycode={keycode} />) }
+        { this.state.keys.map((keycode, i) => <Key key={i} keycode={keycode} context={context} />) }
       </Layout>
     );
   }
