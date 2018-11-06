@@ -15,7 +15,7 @@ class Keyboard extends Component {
       'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',
       'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
     ],
-    context: new AudioContext(),
+    context: window.AudioContext ? new window.AudioContext() : new window.webkitAudioContext(),
   }
 
   render() {
