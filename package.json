@@ -7,7 +7,8 @@
     "react-dom": "^16.6.0",
     "react-dropzone": "^7.0.1",
     "react-scripts": "2.0.5",
-    "styled-components": "^4.0.2"
+    "styled-components": "^4.0.2",
+    "waveform-data": "^2.0.2"
   },
   "scripts": {
     "start": "react-scripts start",
