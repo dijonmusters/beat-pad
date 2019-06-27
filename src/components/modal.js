@@ -22,7 +22,6 @@ const Modal = ({ handleClose, show, children }) => {
     left:50%;
     transform: translate(-50%,-50%);
   `;
-
   return (
     <Wrapper isShown={show}>
       <Main>

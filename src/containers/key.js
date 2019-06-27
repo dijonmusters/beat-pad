@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import Dropzone from 'react-dropzone'
 import styled from 'styled-components';
-import WaveformData from 'waveform-data';
-import webAudioBuilder from 'waveform-data/webaudio';
+import drawBuffer from 'draw-wave';
+// import WaveformData from 'waveform-data';
+// import webAudioBuilder from 'waveform-data/webaudio';
 import Modal from '../components/modal';
 
 const Keycap = styled.div`
@@ -30,6 +31,7 @@ class Key extends Component {
   }
 
   componentDidMount() {
+    this.drawWaveform();
     document.addEventListener('keydown', (e) => {
       const { keycode } = this.props;
       const { sound } = this.state;
@@ -46,6 +48,10 @@ class Key extends Component {
     });
   }
 
+  componentDidUpdate() {
+    this.drawWaveform();
+  }
+
   onDrop = (files) => {
     (files.length > 0) ? this.loadSound(files[0]) : console.error('inappropriate file type. audio only!');
   }
@@ -54,38 +60,97 @@ class Key extends Component {
     console.error('there was an error loading audio file');
   }
 
+  drawWaveform = () => {
+    const { sound } = this.state;
+    const canvas = document.getElementById('waveform');
+    sound && canvas && drawBuffer.canvas(canvas, sound, '#52F6A4');
+    // const { sound, analyser, bufferArray } = this.state;
+    // const drawVisual = requestAnimationFrame(this.drawWaveform);
+    // analyser.fftSize = 2048;
+    // var bufferLength = analyser.frequencyBinCount;
+    // var dataArray = new Uint8Array(bufferLength);
+    // analyser.getByteTimeDomainData(dataArray);
+    // const canvas = document.getElementById('waveform');
+    // const canvasCtx = canvas.getContext("2d");
+    // const WIDTH = 300;
+    // const HEIGHT = 300;
+    // const bufferLength = sound.length;
+    // context.fillStyle = 'rgb(200, 200, 200)';
+    // canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+    // canvasCtx.lineWidth = 2;
+    // canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+    // canvasCtx.beginPath();
+    // var sliceWidth = WIDTH * 1.0 / bufferLength;
+    // var x = 0;
+    // for(var i = 0; i < bufferLength; i++) {
+    //   var v = sound[i] / 128.0;
+    //   var y = v * HEIGHT/2;
+
+    //   if(i === 0) {
+    //     canvasCtx.moveTo(x, y);
+    //   } else {
+    //     canvasCtx.lineTo(x, y);
+    //   }
+
+    //   x += sliceWidth;
+    //   canvasCtx.lineTo(canvas.width, canvas.height/2);
+    //   canvasCtx.stroke();
+    // var data = buffer.getChannelData( 0 );
+    // var step = Math.ceil( data.length / width );
+    // var amp = height / 2;
+    // context.beginPath();
+    // for(let i = 0; i < width; i++){
+    //   let min = 1.0;
+    //   let max = -1.0;
+    //   for (let j = 0; j < step; j++) {
+    //     const datum = data[(i*step)+j];
+    //     if (datum < min)
+    //       min = datum;
+    //     if (datum > max)
+    //       max = datum;
+    //   }
+    //   context.fillRect(i,(1+min)*amp,1,Math.max(1,(max-min)*amp));
+    // }
+    // context.closePath();
+    // context.stroke()
+    // debugger;
+    // const canvas = document.getElementById('waveform');
+    // const ctx = canvas.getContext('2d');
+    // const { sound } = this.state;
+    // var i, n = sound.length;
+    // var dur = (n / 44100 * 1000)>>0;
+    // canvas.title = 'Duration: ' +  dur / 1000.0 + 's';
+
+    // const { width, height } = canvas;
+    // ctx.strokeStyle = 'yellow';
+    // ctx.fillStyle = '#303030';
+    // ctx.fillRect(0, 0, width, height);
+    // ctx.beginPath();
+    // ctx.moveTo(0, height / 2);
+    // let x, y;
+    // for (i=0; i<n; i++)
+    // {
+    //     x = ( (i*width) / n);
+    //     y = ((sound[i]*height/2)+height/2);
+    //     ctx.lineTo(x, y);
+    // }
+    // ctx.stroke();
+    // ctx.closePath();
+    // canvas.mBuffer = samples;
+  }
+
   loadSound(file) {
     const { context } = this.props;
     const reader = new FileReader();
     reader.onload = () => {
       const bufferArray = reader.result;
-      webAudioBuilder(context, bufferArray, (err, waveformData) => {
-        const waveform = WaveformData.create(bufferArray);
-
-        const interpolateHeight = (total_height) => {
-          const amplitude = 256;
-          return (size) => total_height - ((size + 128) * total_height) / amplitude;
-        };
-        const canvas = document.getElementById('waveform');
-        const y = interpolateHeight(canvas.height);
-        const ctx = canvas.getContext('2d');
-        ctx.beginPath();
-        ctx.fillStyle = 'rgb(200, 0, 0)';
-        // from 0 to 100
-        waveform.min.forEach((val, x) => ctx.lineTo(x + 0.5, y(val) + 0.5));
-
-        // then looping back from 100 to 0
-        waveform.max.reverse().forEach((val, x) => {
-          ctx.lineTo((waveform.offset_length - x) + 0.5, y(val) + 0.5);
-        });
-
-        // ctx.closePath();
-        // ctx.fillStroke();
-      });
       context.decodeAudioData(bufferArray, (buffer) => {
         const { options } = this.state;
         options.duration = buffer.duration;
         options.end = options.duration;
+        // const analyser = context.createAnalyser();
+        // const source = context.createMediaStreamSource(bufferArray);
+        // source.connect(analyser);
         this.setState({ sound: buffer, options });
       }, this.onError);
     }
@@ -161,12 +226,13 @@ class Key extends Component {
           <Keycap isActive={active} hasSound={hasSound}>{keycode}</Keycap>
         </Dropzone>
         <Modal show={this.state.isModalVisible} handleClose={this.hideModal}>
-          <canvas id="waveform" width="150" height="150"></canvas>
+          <canvas id="waveform" width="750" height="200"></canvas>
           <label htmlFor="startTime">Start</label>
           <input type="range" min="0" max={options.duration} value={options.start} id="startTime" onChange={this.handleStartChange} />
           <label htmlFor="endTime">End</label>
           <input type="range" min="0" max={options.duration} value={options.end} id="endTime" onChange={this.handleEndChange} />
         </Modal>
+        {/* {this.drawWaveform()} */}
       </>
     );
   }
